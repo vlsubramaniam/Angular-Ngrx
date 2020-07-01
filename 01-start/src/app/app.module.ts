@@ -1,5 +1,6 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
+import { RouterState, StoreRouterConnectingModule } from "@ngrx/router-store";
 
 import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
@@ -20,7 +21,7 @@ import { environment } from "../environments/environment";
 import { EffectsModule } from "@ngrx/effects";
 import { EntityDataModule } from "@ngrx/data";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { reducers } from "./reducers";
+import { reducers, metaReducers } from "./reducers";
 import { AuthGuard } from "./auth/auth.guard";
 
 const routes: Routes = [
@@ -50,13 +51,25 @@ const routes: Routes = [
     MatListModule,
     MatToolbarModule,
     AuthModule.forRoot(),
-    StoreModule.forRoot(reducers),
+    StoreModule.forRoot(reducers, {
+      metaReducers: metaReducers,
+      runtimeChecks: {
+        strictActionImmutability: true,
+        strictStateImmutability: true,
+        strictActionSerializability: true,
+        strictStateSerializability: true,
+      },
+    }),
     StoreDevtoolsModule.instrument({
       maxAge: 25,
       logOnly: environment.production,
     }),
+    EffectsModule.forRoot([]),
+    StoreRouterConnectingModule.forRoot({
+      stateKey: "router",
+      routerState: RouterState.Minimal,
+    }),
   ],
   bootstrap: [AppComponent],
-  providers: [AuthGuard],
 })
 export class AppModule {}

@@ -9,8 +9,9 @@ import {
   Router,
 } from "@angular/router";
 import { AppState } from "./reducers";
-import { logout } from "./auth/auth.actions";
+import { logout, login } from "./auth/auth.actions";
 import { isLoggedIn, isLoggedOut } from "./auth/auth.selectors";
+import { AuthActions } from "./auth/auth.action.types";
 
 @Component({
   selector: "app-root",
@@ -25,6 +26,11 @@ export class AppComponent implements OnInit {
   constructor(private router: Router, private store: Store<AppState>) {}
 
   ngOnInit() {
+    const userProfile = localStorage.getItem("user");
+    if (userProfile) {
+      this.store.dispatch(login({ user: JSON.parse(userProfile) }));
+    }
+
     this.isLoggedIn$ = this.store.pipe(select(isLoggedIn));
     this.isLoggedOut$ = this.store.pipe(select(isLoggedOut));
     this.router.events.subscribe((event) => {
